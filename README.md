@@ -68,7 +68,7 @@ Sijeesh Miziha's Flipkart Clone is done with top-notch features for the entrepre
    - Basic knowledge in MongoDB & Mongoose
    
 
-
+https://github.com/joyizwami/ai-buyer-agent/blob/341f117a0abdee16aa74918ee7c36723cbf2d54a/Screenshot%202026-09-04%20151727.png
 
 
   
