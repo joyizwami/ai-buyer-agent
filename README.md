@@ -67,11 +67,12 @@ Sijeesh Miziha's Flipkart Clone is done with top-notch features for the entrepre
    - Knowledge of Express js & MVC architecture
    - Basic knowledge in MongoDB & Mongoose
    
-
+![image alt](https://github.com/joyizwami/ai-buyer-agent/blob/13eb48078b84907f2fcf514782c916f08c3b0138/Screenshot%202026-09-04%20151708.png)
 ![image alt](https://github.com/joyizwami/ai-buyer-agent/blob/341f117a0abdee16aa74918ee7c36723cbf2d54a/Screenshot%202026-09-04%20151727.png)
-
-
-  
+![image alt](https://github.com/joyizwami/ai-buyer-agent/blob/13eb48078b84907f2fcf514782c916f08c3b0138/Screenshot%202026-09-04%20151743.png)
+![image alt](https://github.com/joyizwami/ai-buyer-agent/blob/13eb48078b84907f2fcf514782c916f08c3b0138/Screenshot%202026-09-04%20151839.png)
+![image alt](https://github.com/joyizwami/ai-buyer-agent/blob/13eb48078b84907f2fcf514782c916f08c3b0138/Screenshot%202026-09-04%20151854.png)
+![image alt](https://github.com/joyizwami/ai-buyer-agent/blob/13eb48078b84907f2fcf514782c916f08c3b0138/Screenshot%202026-09-04%20152020.png)
 Flipkart is one of the best and trending eCommerce sites with a presence throughout India. The online shopping website is for Buying and Selling products online within the network.
 
 Sijeesh Miziha's Flipkart clone is a ready-made remarkable multi-vendor eCommerce site built-in compleatly JavaScript that helps Entrepreneurs can start their own business like Flipkart, which allows the vendors to add products & users to buy the products easily with just a click.
