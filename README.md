@@ -8,7 +8,19 @@ One monorepo containing a Flipkart-style storefront and an AI Buyer Agent that s
 - `server/`: Flipkart Express API and MongoDB product service
 - `ai-buyer-agent/`: FastAPI buyer, policy, Razorpay, receipt, and image-search service
 
-## Run Locally
+## AI BUYER AGENT 
+AI Buyer Agent solves these real-world problems:
+
+Slow purchasing: Users describe what they need in natural language instead of manually browsing products.
+Poor product selection: AI ranks products by relevance, price, availability, rating, and budget fit.
+Overspending: Budget limits are checked before an order is created.
+Unsafe autonomous purchases: Expensive purchases require human approval.
+Disconnected payments: Approved purchases create Razorpay payment orders directly.
+Weak accountability: Transactions record the selected product, reasoning, approval, payment, and status.
+Manual receipt handling: Completed payments can trigger email receipts.
+Catalog search friction: Users can search across the Flipkart product catalog from the AI panel.
+Image-based shopping difficulty: Users can upload a product image for vision-assisted catalog search when a vision provider is configured.
+
 
 ### 1. Flipkart API
 
