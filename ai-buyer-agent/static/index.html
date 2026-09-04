@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Buyer Agent</title>
+    <style>
+        :root {
+            --bg: #07111f;
+            --bg-alt: #0d1728;
+            --panel: rgba(15, 22, 35, 0.9);
+            --panel-strong: #111c2d;
+            --border: rgba(148, 163, 184, 0.18);
+            --accent: #7c9cff;
+            --accent-strong: #5b7cfa;
+            --accent-soft: rgba(124, 156, 255, 0.14);
+            --text: #edf4ff;
+            --text-dim: #9fb1c9;
+            --success: #34d399;
+            --success-soft: rgba(52, 211, 153, 0.12);
+            --warning: #fbbf24;
+            --warning-soft: rgba(251, 191, 36, 0.12);
+            --error: #f87171;
+            --error-soft: rgba(248, 113, 113, 0.12);
+            --shadow: 0 24px 52px rgba(2, 6, 23, 0.46);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background:
+                radial-gradient(circle at top left, rgba(124, 156, 255, 0.14), transparent 28%),
+                radial-gradient(circle at bottom right, rgba(52, 211, 153, 0.12), transparent 26%),
+                var(--bg);
+            color: var(--text);
+            line-height: 1.55;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 22px 18px 42px;
+        }
+
+        .shell {
+            display: grid;
+            grid-template-columns: 1.6fr 0.8fr;
+            gap: 22px;
+        }
+
+        .panel {
+            background: linear-gradient(180deg, rgba(16, 24, 38, 0.96), rgba(8, 15, 24, 0.96));
+            border: 1px solid var(--border);
+            border-radius: 22px;
+            box-shadow: var(--shadow);
+        }
+
+        .main {
+            padding: 18px;
+        }
+
+        .side {
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            padding: 6px 4px 18px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 18px;
+        }
+
+        .brand-wrap {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .brand-mark {
+            width: 52px;
+            height: 52px;
+            display: grid;
+            place-items: center;
+            border-radius: 16px;
+            background: linear-gradient(135deg, var(--accent), #a382ff);
+            box-shadow: 0 16px 28px rgba(91, 124, 250, 0.25);
+            font-size: 1.5rem;
+        }
+
+        h1 {
+            font-size: clamp(2rem, 2.8vw, 2.7rem);
+            letter-spacing: -0.06em;
+            font-weight: 800;
+            background: linear-gradient(135deg, #edf4ff 0%, #9ec0ff 38%, #c5b9ff 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .subtitle {
+            color: var(--text-dim);
+            font-size: 0.92rem;
+            margin-top: 2px;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: rgba(52, 211, 153, 0.08);
+            border: 1px solid rgba(52, 211, 153, 0.36);
+            color: #bafcd5;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success);
+            box-shadow: 0 0 0 6px rgba(52, 211, 153, 0.12);
+        }
+
+        .chat-box {
+            background: rgba(8, 13, 21, 0.88);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 16px;
+        }
+
+        .chat-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .chat-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+        }
+
+        .tiny-badge {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: var(--success);
+            box-shadow: 0 0 0 6px rgba(52, 211, 153, 0.12);
+        }
+
+        .mini-btn {
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text);
+            padding: 8px 12px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            box-shadow: none;
+        }
+
+        .msg-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            min-height: 160px;
+        }
+
+        .msg {
+            max-width: 90%;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 12px 14px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .msg.user {
+            background: rgba(124, 156, 255, 0.08);
+            border-color: rgba(124, 156, 255, 0.22);
+            align-self: flex-end;
+        }
+
+        .msg.ai {
+            background: rgba(7, 13, 22, 0.9);
+            align-self: flex-start;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        input[type="text"], input[type="number"], textarea {
+            width: 100%;
+            background: rgba(7, 13, 22, 0.86);
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 13px 14px;
+            font-size: 0.96rem;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        input::placeholder { color: #7587a5; }
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: rgba(124, 156, 255, 0.8);
+            box-shadow: 0 0 0 4px rgba(124, 156, 255, 0.12);
+        }
+
+        button {
+            border: none;
+            border-radius: 12px;
+            padding: 12px 18px;
+            font-weight: 700;
+            letter-spacing: 0.01em;
+            background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 12px 22px rgba(91, 124, 250, 0.25);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 14px 26px rgba(91, 124, 250, 0.3);
+        }
+
+        button:disabled {
+            opacity: 0.65;
+            cursor: wait;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .secondary {
+            background: transparent;
+            border: 1px solid var(--border);
+            box-shadow: none;
+            color: var(--text);
+        }
+
+        .secondary:hover { background: rgba(148,163,184,0.04); }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0,1fr));
+            gap: 12px;
+            margin-top: 18px;
+        }
+
+        .meta-card {
+            background: rgba(7, 13, 22, 0.82);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 14px;
+        }
+
+        .meta-label {
+            color: var(--text-dim);
+            font-size: 0.76rem;
+            margin-bottom: 6px;
+        }
+
+        .meta-value {
+            font-weight: 800;
+            font-size: 1.05rem;
+            letter-spacing: -0.03em;
+        }
+
+        .result-box {
+            margin-top: 18px;
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            background: rgba(7, 13, 22, 0.72);
+            padding: 14px;
+        }
+
+        .result-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: var(--accent-soft);
+            color: #dfe9ff;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .product-card {
+            background: rgba(10, 16, 25, 0.9);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 14px;
+        }
+
+        .product-name {
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 6px;
+        }
+
+        .product-brand {
+            color: var(--text-dim);
+            font-size: 0.8rem;
+            margin-bottom: 8px;
+        }
+
+        .product-price {
+            color: #bafcd5;
+            font-size: 1.32rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .badge-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+
+        .story-box {
+            border: 1px solid rgba(124, 156, 255, 0.24);
+            border-radius: 16px;
+            background: rgba(124, 156, 255, 0.08);
+            padding: 12px 14px;
+            margin-top: 12px;
+            color: #e5edff;
+        }
+
+        .story-box h4 {
+            margin-bottom: 8px;
+            font-size: 0.78rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #bdd1ff;
+        }
+
+        .policy-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .policy-chip {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            padding: 10px 12px;
+            background: rgba(7, 13, 22, 0.9);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+        }
+
+        .policy-chip span {
+            color: var(--text-dim);
+            font-size: 0.68rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .policy-chip strong {
+            font-size: 0.9rem;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            border-radius: 999px;
+            padding: 5px 9px;
+            font-size: 0.66rem;
+            font-weight: 700;
+            text-transform: capitalize;
+        }
+
+        .badge-in-stock { background: var(--success-soft); color: #bafcd5; }
+        .badge-low-stock { background: var(--warning-soft); color: #f9d97d; }
+        .badge-pending { background: var(--accent-soft); color: #dfe9ff; }
+
+        .product-meta {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            font-size: 0.75rem;
+            color: var(--text-dim);
+        }
+
+        .card-block {
+            background: rgba(7, 13, 22, 0.82);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 14px;
+        }
+
+        .card-block h3 {
+            font-size: 1rem;
+            margin-bottom: 10px;
+        }
+
+        .info-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .info-row:last-child { border-bottom: none; }
+        .info-label { color: var(--text-dim); }
+        .info-value { font-weight: 700; text-align: right; }
+
+        .txn-item {
+            padding: 14px;
+            background: rgba(7, 13, 22, 0.82);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            margin-bottom: 10px;
+        }
+
+        .txn-head {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .txn-status {
+            font-size: 0.64rem;
+            font-weight: 800;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .loading,
+        .error-msg,
+        .success-msg {
+            border-radius: 14px;
+            padding: 12px 14px;
+            margin-top: 12px;
+            font-size: 0.92rem;
+        }
+
+        .loading {
+            background: rgba(7, 13, 22, 0.82);
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+        }
+
+        .error-msg {
+            background: var(--error-soft);
+            border: 1px solid rgba(248, 113, 113, 0.34);
+            color: #fecaca;
+        }
+
+        .success-msg {
+            background: var(--success-soft);
+            border: 1px solid rgba(52, 211, 153, 0.34);
+            color: #bafcd5;
+        }
+
+        .razorpay-btn {
+            width: 100%;
+            margin-top: 12px;
+            background: linear-gradient(135deg, #42a5ff, #3388ff);
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.25);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        @media (max-width: 980px) {
+            .shell { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 560px) {
+            .container { padding-left: 14px; padding-right: 14px; }
+            .main, .side { padding: 14px; }
+            .input-row { flex-direction: column; }
+            .meta-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="shell">
+            <div class="panel main">
+                <header class="topbar">
+                    <div class="brand-wrap">
+                        <div class="brand-mark">🛒</div>
+                        <div>
+                            <h1>AI Buyer Agent</h1>
+                            <div class="subtitle">Autonomous purchasing with intelligent product discovery</div>
+                        </div>
+                    </div>
+                    <div class="status-pill"><span class="status-dot"></span> Demo mode</div>
+                </header>
+
+                <div class="chat-box">
+                    <div class="chat-header">
+                        <div class="chat-title"><span class="tiny-badge"></span> AI procurement assistant</div>
+                        <button class="mini-btn" type="button" onclick="searchProducts()">Refresh</button>
+                    </div>
+                    <div class="msg-list">
+                        <div class="msg ai">I can interpret your request, shortlist the best product, validate budget and policy constraints, and complete a compliant payment workflow.</div>
+                        <div class="msg user">Buy Sony headphones under ₹25000</div>
+                    </div>
+
+                    <div class="input-row">
+                        <input id="query" type="text" placeholder="Describe what you want to buy..." value="Buy Sony headphones under ₹25000" />
+                        <button id="buy-btn" onclick="submitPurchase()">Buy now</button>
+                    </div>
+
+                    <div class="meta-grid">
+                        <div class="meta-card">
+                            <div class="meta-label">Max budget</div>
+                            <div class="meta-value"><input id="budget" type="number" placeholder="₹25000" value="25000" /></div>
+                        </div>
+                        <div class="meta-card">
+                            <div class="meta-label">User ID</div>
+                            <div class="meta-value"><input id="user-id" type="text" value="user_demo" /></div>
+                        </div>
+                        <div class="meta-card">
+                            <div class="meta-label">Approval</div>
+                            <div class="meta-value"><label style="display:flex;align-items:center;gap:8px;font-size:0.9rem;color:var(--text-dim);"><input id="require-approval" type="checkbox" /> Required</label></div>
+                        </div>
+                    </div>
+
+                    <div id="buy-result" class="result-box"></div>
+                    <div class="story-box">
+                        <h4>Why this matters</h4>
+                        <p>Teams often waste time comparing products, missing budget rules, and chasing approvals. This system reduces that friction by turning a natural-language request into a validated, compliant purchase decision.</p>
+                    </div>
+                </div>
+            </div>
+
+            <aside class="panel side">
+                <div class="card-block">
+                    <h3>🔎 Search catalog</h3>
+                    <div class="input-row" style="margin-top: 0; flex-direction: column;">
+                        <input id="search-query" type="text" placeholder="Search products..." />
+                        <input id="search-max-price" type="number" placeholder="Max price (₹)" />
+                        <input id="search-category" type="text" placeholder="Category" />
+                        <input id="search-brand" type="text" placeholder="Brand" />
+                        <button class="secondary" type="button" onclick="searchProducts()">Search</button>
+                    </div>
+                </div>
+
+                <div class="card-block">
+                    <h3>⚙️ Spending limits</h3>
+                    <div id="limits-info" class="info-list"></div>
+                </div>
+
+                <div class="card-block">
+                    <h3>📋 Recent activity</h3>
+                    <div class="input-row" style="margin-top: 0; flex-direction: column;">
+                        <input id="history-user-id" type="text" value="user_demo" placeholder="User ID" />
+                        <button type="button" onclick="loadHistory()">Load history</button>
+                    </div>
+                    <div id="history-results" style="margin-top: 12px;"></div>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+        const API_BASE = window.location.origin;
+        let razorpayKey = '';
+
+        const categoryKeywords = {
+            electronics: ['headphone', 'earbud', 'phone', 'speaker', 'watch', 'keyboard', 'mouse', 'monitor', 'camera', 'laptop', 'tablet'],
+            clothing: ['shirt', 'jeans', 'dress', 'jacket', 'hoodie', 'tshirt', 'shoe', 'sneaker'],
+            sports: ['shoe', 'running', 'fitness', 'yoga', 'gym', 'ball', 'racket', 'helmet'],
+            home_kitchen: ['bottle', 'mug', 'pan', 'pot', 'utensil', 'plate', 'bowl', 'knife'],
+            books: ['book', 'novel', 'guide', 'textbook', 'manual'],
+            beauty: ['cream', 'serum', 'shampoo', 'soap', 'lotion', 'perfume'],
+            toys: ['toy', 'game', 'puzzle', 'lego', 'doll'],
+            health: ['vitamin', 'supplement', 'bandage', 'mask', 'medicine'],
+            grocery: ['rice', 'dal', 'oil', 'snack', 'milk', 'bread', 'water']
+        };
+
+        function localIntentFromQuery(query, budget) {
+            const text = (query || '').toLowerCase();
+            let category = null;
+            let brand = null;
+            const priceMatch = text.match(/(?:under|below|upto|up to|less than|<=)\s*₹?\s*(\d+(?:,\d{3})*(?:\.\d+)?)/i)
+                || text.match(/(?:under|below|upto|up to|less than|<=)\s*(\d+(?:,\d{3})*(?:\.\d+)?)/i)
+                || text.match(/\b(\d{3,6})\b/);
+
+            const maxPrice = priceMatch ? Number(String(priceMatch[1]).replace(/,/g, '')) * 100 : (budget ? Number(budget) * 100 : null);
+
+            const brandCandidates = ['sony', 'boat', 'samsung', 'nike', 'milton', 'uniqlo', 'noise', 'redragon'];
+            brand = brandCandidates.find(name => text.includes(name)) || null;
+
+            for (const [key, words] of Object.entries(categoryKeywords)) {
+                if (words.some(word => text.includes(word))) {
+                    category = key;
+                    break;
+                }
+            }
+
+            return {
+                intent_type: text.includes('buy') || text.includes('get') || text.includes('purchase') ? 'purchase' : 'search',
+                category,
+                brand,
+                max_price_paise: maxPrice ? Math.round(maxPrice) : null,
+                keywords: [...new Set((text.match(/[a-z0-9-]+/g) || []).filter(v => v.length > 2).slice(0, 6))],
+                confidence: 0.82
+            };
+        }
+
+        function showAiIntent() {
+            const query = document.getElementById('query').value || '';
+            const budget = document.getElementById('budget').value || '';
+            const intent = localIntentFromQuery(query, budget);
+            const box = document.getElementById('buy-result');
+
+            box.innerHTML = `
+                <div class="result-head">
+                    <strong>AI intent</strong>
+                    <span class="pill">${intent.intent_type}</span>
+                </div>
+                <div class="info-list" style="margin-top: 10px;">
+                    <div class="info-row"><span class="info-label">Category</span><span class="info-value">${intent.category || 'not detected'}</span></div>
+                    <div class="info-row"><span class="info-label">Brand</span><span class="info-value">${intent.brand || 'not detected'}</span></div>
+                    <div class="info-row"><span class="info-label">Max budget</span><span class="info-value">${intent.max_price_paise ? `₹${(intent.max_price_paise / 100).toLocaleString('en-IN')}` : 'not specified'}</span></div>
+                    <div class="info-row"><span class="info-label">Confidence</span><span class="info-value">${(intent.confidence * 100).toFixed(0)}%</span></div>
+                </div>
+                <div class="story-box">
+                    <h4>Decision rationale</h4>
+                    <p>AI parsed “${query}” as a ${intent.intent_type} request, prioritized ${intent.category || 'general'} matching, and used ${intent.brand ? 'brand preference ' + intent.brand : 'broad market alternatives'} while keeping spending within the configured policy.</p>
+                </div>
+            `;
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadLimits();
+            loadHistory();
+            showAiIntent();
+            searchProducts();
+        });
+
+        async function loadLimits() {
+            try {
+                const res = await fetch(`${API_BASE}/limits`);
+                const data = await res.json();
+                razorpayKey = data.razorpay_key_id || '';
+
+                document.getElementById('limits-info').innerHTML = `
+                    <div class="info-row"><span class="info-label">Max transaction</span><span class="info-value">₹${data.max_transaction_inr?.toLocaleString()}</span></div>
+                    <div class="info-row"><span class="info-label">Daily limit</span><span class="info-value">₹${data.daily_spending_limit_inr?.toLocaleString()}</span></div>
+                    <div class="info-row"><span class="info-label">Approval threshold</span><span class="info-value">₹${data.approval_threshold_inr?.toLocaleString()}</span></div>
+                    <div class="info-row"><span class="info-label">Test mode</span><span class="info-value">${data.razorpay_test_mode ? '✅ Yes' : '❌ No'}</span></div>
+                    <div class="info-row"><span class="info-label">LLM provider</span><span class="info-value">${data.llm_provider || 'Not configured'}</span></div>
+                `;
+            } catch (err) {
+                document.getElementById('limits-info').innerHTML = `<div class="error-msg">Failed to load limits: ${err.message}</div>`;
+            }
+        }
+
+        async function submitPurchase() {
+            const btn = document.getElementById('buy-btn');
+            const resultDiv = document.getElementById('buy-result');
+            const userId = document.getElementById('user-id').value || 'user_demo';
+            const query = document.getElementById('query').value;
+            const budget = document.getElementById('budget').value;
+            const requireApproval = document.getElementById('require-approval').checked;
+
+            if (!query.trim()) {
+                resultDiv.innerHTML = '<div class="error-msg">Please describe the product you want to buy.</div>';
+                return;
+            }
+
+            const intent = localIntentFromQuery(query, budget);
+            showAiIntent();
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span>AI is deciding...';
+            resultDiv.innerHTML = '<div class="loading"><span class="spinner"></span>AI is parsing your request and checking spending policy...</div>';
+
+            try {
+                const payload = {
+                    user_id: userId,
+                    query: query,
+                    max_budget: budget ? parseInt(budget) : intent.max_price_paise ? Math.round(intent.max_price_paise / 100) : null,
+                    require_approval: requireApproval,
+                    preferences: {
+                        preferred_brand: intent.brand || null,
+                        preferred_category: intent.category || null,
+                        max_budget_paise: intent.max_price_paise ? intent.max_price_paise : (budget ? parseInt(budget) * 100 : null)
+                    }
+                };
+
+                const res = await fetch(`${API_BASE}/purchase`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await res.json();
+
+                if (data.status === 'payment_initiated') {
+                    resultDiv.innerHTML = `
+                        <div class="success-msg">✅ AI selected <strong>${data.product.name}</strong> for ₹${data.product.price_inr?.toLocaleString()}.</div>
+                        <div class="story-box">
+                            <h4>AI explanation</h4>
+                            <p>${data.ai_explanation || 'Selected for the strongest overall fit across budget, rating, and availability.'}</p>
+                        </div>
+                        <div class="policy-grid">
+                            <div class="policy-chip"><span>Budget</span><strong>₹${(data.policy_summary?.budget_limit_inr || data.product.price_inr).toLocaleString()}</strong></div>
+                            <div class="policy-chip"><span>Approval</span><strong>${data.policy_summary?.approval_threshold_inr ? 'Within threshold' : 'Not required'}</strong></div>
+                            <div class="policy-chip"><span>Daily limit</span><strong>₹${(data.policy_summary?.daily_limit_inr || 0).toLocaleString()}</strong></div>
+                            <div class="policy-chip"><span>Status</span><strong>${data.policy_summary?.status || 'approved'}</strong></div>
+                        </div>
+                        <button class="razorpay-btn" onclick="openRazorpay('${data.payment.order_id}', ${data.product.price_inr * 100})">💳 Pay ₹${data.product.price_inr?.toLocaleString()}</button>
+                    `;
+                } else if (data.status === 'pending_approval') {
+                    resultDiv.innerHTML = `
+                        <div class="success-msg" style="background: rgba(251,191,36,0.12); border-color: rgba(251,191,36,0.45); color: #fde68a;">⏳ AI requires approval for <strong>${data.product.name}</strong> (₹${data.product.price_inr?.toLocaleString()}). ${data.message}</div>
+                        <div class="story-box">
+                            <h4>AI explanation</h4>
+                            <p>${data.ai_explanation || 'The product fits the request, but the policy check triggered a human approval requirement.'}</p>
+                        </div>
+                        <div class="input-row" style="margin-top: 12px;">
+                            <button onclick="approveTransaction('${data.transaction_id}', true)" style="background: linear-gradient(135deg, #34d399, #10b981); box-shadow: none;">✅ Approve</button>
+                            <button onclick="approveTransaction('${data.transaction_id}', false)" style="background: linear-gradient(135deg, #f87171, #ef4444); box-shadow: none;">❌ Reject</button>
+                        </div>
+                    `;
+                } else if (data.status === 'failed') {
+                    resultDiv.innerHTML = `
+                        <div class="error-msg">❌ AI blocked this purchase: ${data.message}</div>
+                        <div class="story-box">
+                            <h4>Policy summary</h4>
+                            <p>${data.ai_explanation || 'The request did not satisfy the product or policy filters.'}</p>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<div class="success-msg">Status: ${data.status}</div>`;
+                }
+" style="background: linear-gradient(135deg, #34d399, #10b981); box-shadow: none;">✅ Approve</button>
+                            <button onclick="approveTransaction('${data.transaction_id}', false)" style="background: linear-gradient(135deg, #f87171, #ef4444); box-shadow: none;">❌ Reject</button>
+                        </div>
+                    `;
+                } else if (data.status === 'failed') {
+                    resultDiv.innerHTML = `<div class="error-msg">❌ AI blocked this purchase: ${data.message}</div>`;
+                } else {
+                    resultDiv.innerHTML = `<div class="success-msg">Status: ${data.status}</div>`;
+                }
+            } catch (err) {
+                resultDiv.innerHTML = `<div class="error-msg">Error: ${err.message}</div>`;
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'Buy now';
+            }
+        }
+
+        function openRazorpay(orderId, amount) {
+            const options = {
+                key: razorpayKey,
+                amount: amount,
+                currency: 'INR',
+                name: 'AI Buyer Agent',
+                description: 'Purchase via AI Buyer Agent',
+                order_id: orderId,
+                handler: function (response) {
+                    fetch(`${API_BASE}/payment/callback`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            event: 'payment.captured',
+                            payload: {
+                                payment: {
+                                    entity: {
+                                        id: response.razorpay_payment_id,
+                                        order_id: response.razorpay_order_id,
+                                        status: 'captured',
+                                        amount: amount
+                                    }
+                                }
+                            }
+                        })
+                    }).then(() => {
+                        document.getElementById('buy-result').innerHTML = '<div class="success-msg">✅ Payment successful. Transaction completed.</div>';
+                        loadHistory();
+                    });
+                },
+                prefill: { name: 'Demo User', email: 'demo@example.com', contact: '9999999999' },
+                theme: { color: '#7c9cff' },
+                modal: { ondismiss: function() { document.getElementById('buy-result').innerHTML = '<div class="error-msg">Payment cancelled by the user.</div>'; } }
+            };
+            const rzp = new Razorpay(options);
+            rzp.open();
+        }
+
+        async function approveTransaction(transactionId, approved) {
+            try {
+                const res = await fetch(`${API_BASE}/approve/${transactionId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ approved, approver_id: 'human_reviewer', reason: approved ? null : 'Rejected by reviewer' })
+                });
+                const data = await res.json();
+                document.getElementById('buy-result').innerHTML = `<div class="success-msg">${data.message}</div>`;
+                loadHistory();
+            } catch (err) {
+                alert('Error: ' + err.message);
+            }
+        }
+
+        async function searchProducts() {
+            const resultsDiv = document.getElementById('buy-result');
+            const query = document.getElementById('search-query').value || document.getElementById('query').value || '';
+            const maxPrice = document.getElementById('search-max-price').value;
+            const category = document.getElementById('search-category').value;
+            const brand = document.getElementById('search-brand').value;
+
+            const intent = localIntentFromQuery(query, maxPrice || '');
+            showAiIntent();
+
+            resultsDiv.innerHTML = '<div class="loading"><span class="spinner"></span>AI is ranking products...</div>';
+
+            try {
+                const payload = {
+                    query: query,
+                    user_id: document.getElementById('user-id').value || 'user_demo',
+                    max_results: 6,
+                    filters: {
+                        max_price_paise: maxPrice ? parseInt(maxPrice) * 100 : (intent.max_price_paise || null),
+                        category: category ? category.trim().toLowerCase() : (intent.category || null),
+                        brand: brand ? brand.trim() : (intent.brand || null),
+                        in_stock_only: true
+                    },
+                    user_preferences: {
+                        max_budget_paise: maxPrice ? parseInt(maxPrice) * 100 : (intent.max_price_paise || 5000000),
+                        preferred_brand: brand || intent.brand || null
+                    }
+                };
+
+                const res = await fetch(`${API_BASE}/search`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await res.json();
+
+                if (!data.products || data.products.length === 0) {
+                    resultsDiv.innerHTML = '<div class="loading">No products found. The AI did not find a strong match for these filters.</div>';
+                    return;
+                }
+
+                resultsDiv.innerHTML = `
+                    <div class="result-head">
+                        <strong>AI ranked results</strong>
+                        <span class="pill">${data.total_found} matches</span>
+                    </div>
+                    <div class="product-grid">
+                        ${data.products.map(p => `
+                            <div class="product-card">
+                                <div class="product-name">${p.product.name}</div>
+                                <div class="product-brand">${p.product.brand}</div>
+                                <div class="product-price">₹${p.product.price_inr?.toLocaleString()}</div>
+                                <div class="badge-row">
+                                    <span class="badge badge-${p.product.availability.replace('_', '-')}">${p.product.availability.replace('_', ' ')}</span>
+                                    <span class="badge badge-pending">AI ${(p.score * 100).toFixed(0)}%</span>
+                                </div>
+                                <div class="story-box" style="margin-top: 8px; padding: 10px 12px;">
+                                    <h4 style="margin-bottom: 6px;">Why ranked here</h4>
+                                    <p style="font-size: 0.8rem; line-height: 1.5;">${(p.match_reasons || ['Strong overall fit']).join(' • ')}</p>
+                                </div>
+                                <div class="product-meta" style="margin-top: 10px;">
+                                    <span>⭐ ${p.product.rating}/5</span>
+                                    <span>📦 ${p.product.delivery_days_min}-${p.product.delivery_days_max}d</span>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            } catch (err) {
+                resultsDiv.innerHTML = `<div class="error-msg">Search failed: ${err.message}</div>`;
+            }
+        }
+
+        async function loadHistory() {
+            const resultsDiv = document.getElementById('history-results');
+            const userId = document.getElementById('history-user-id').value || 'user_demo';
+
+            resultsDiv.innerHTML = '<div class="loading"><span class="spinner"></span>Loading activity...</div>';
+
+            try {
+                const res = await fetch(`${API_BASE}/transactions/${userId}?limit=10`);
+                const data = await res.json();
+
+                if (!data.transactions || data.transactions.length === 0) {
+                    resultsDiv.innerHTML = '<div class="loading">No transactions yet for this user.</div>';
+                    return;
+                }
+
+                const statusColors = {
+                    'completed': '#34d399',
+                    'payment_initiated': '#fbbf24',
+                    'pending_approval': '#fbbf24',
+                    'failed': '#f87171',
+                    'approved': '#34d399',
+                    'rejected': '#f87171'
+                };
+
+                resultsDiv.innerHTML = data.transactions.map(t => `
+                    <div class="txn-item">
+                        <div class="txn-head">
+                            <strong>${t.product_name || 'N/A'}</strong>
+                            <span class="txn-status" style="color:${statusColors[t.status] || '#edf4ff'};">${(t.status || '').replace('_', ' ').toUpperCase()}</span>
+                        </div>
+                        <div class="info-row"><span class="info-label">Amount</span><span class="info-value">₹${((t.amount_paise || 0) / 100).toLocaleString()}</span></div>
+                        <div class="info-row"><span class="info-label">Query</span><span class="info-value" style="font-size:0.8rem;">${t.original_query}</span></div>
+                        <div class="info-row"><span class="info-label">Created</span><span class="info-value" style="font-size:0.8rem;">${new Date(t.created_at).toLocaleString()}</span></div>
+                    </div>
+                `).join('');
+            } catch (err) {
+                resultsDiv.innerHTML = `<div class="error-msg">Failed to load history: ${err.message}</div>`;
+            }
+        }
+    </script>
+</body>
+</html>
