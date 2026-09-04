@@ -138,8 +138,8 @@ const sampleProducts = [
   },
   {
     id: 'product8',
-    url: 'https://rukminim1.flixcart.com/image/200/200/k2jbyq80pkq/j7gi8w0/mobile/5/y/u/mi-redmi-note-8-pro-mzb81h3in-original-imafgfe5q7k6h9xc.jpeg?q=70',
-    detailUrl: 'https://rukminim1.flixcart.com/image/416/416/k2jbyq80pkq/j7gi8w0/mobile/5/y/u/mi-redmi-note-8-pro-mzb81h3in-original-imafgfe5q7k6h9xc.jpeg?q=70',
+    url: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=300&q=80',
+    detailUrl: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=800&q=80',
     title: { shortTitle: 'Mobiles', longTitle: 'Redmi Note 8 Pro (Shadow Black, 128 GB)' },
     price: { mrp: 18999, cost: 14999, discount: '21%' },
     quantity: 18,

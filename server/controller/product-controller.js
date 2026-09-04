@@ -10,6 +10,11 @@ const ensureSampleProducts = async () => {
         await Product.insertMany(missingProducts);
         console.log(`Seeded ${missingProducts.length} new sample products into database`);
     }
+
+    await Promise.all(sampleProducts.map(product => Product.updateOne(
+        { id: product.id },
+        { $set: { url: product.url, detailUrl: product.detailUrl } }
+    )));
 };
 
 export const getProducts = async (request, response) => {
