@@ -21,6 +21,27 @@ Manual receipt handling: Completed payments can trigger email receipts.
 Catalog search friction: Users can search across the Flipkart product catalog from the AI panel.
 Image-based shopping difficulty: Users can upload a product image for vision-assisted catalog search when a vision provider is configured.
 
+Languages and technologies used:
+
+Python: AI Buyer Agent and FastAPI backend
+JavaScript: Flipkart Express backend and payment integration
+React JSX: Frontend UI
+HTML/CSS: Page structure and styling
+SQL: PostgreSQL schema and audit storage
+MongoDB query language: Product, cart, user, and order data
+JSON: API requests, responses, configuration, and product data
+Main frameworks:
+
+FastAPI
+React
+Express.js
+Material UI
+Razorpay SDK/API
+MongoDB/Mongoose
+PostgreSQL/asyncpg
+
+
+
 
 ### 1. Flipkart API
 
@@ -62,7 +83,7 @@ Open `http://localhost:3000`.
 4. Complete the Razorpay test checkout.
 5. Verify the transaction and receipt workflow.
 
-Razorpay must remain in test mode for local demos. Never commit API keys, SMTP passwords, or other secrets.
+
 # Flipkar Clone MERN stack 
 
 Sijeesh Miziha's Flipkart Clone is done with top-notch features for the entrepreneur startups like Flipkart it has RazorPay Integration and get money from anywhere. This Flipkart clone with the best features in mobile, web, and iOS platforms, Completely responsive design using Material UI.
